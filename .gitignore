@@ -1,23 +1,18 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-#logs
-logs/
-.vscode/
+/.vscode/
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.js
+/package-lock.json
+/package.json
 
-# testing
-/coverage
 
 # next.js
 /.next/
 /out/
 
-# production
-/build
+
 
 # misc
 .DS_Store

@@ -20,7 +20,7 @@ contract pub{
         bool exist;
         uint[] access;
     }
-    mapping (address => publisher1) publisher;
+    mapping (address => publisher1) public publisher;
 
     event published(uint indexed stream_id, address indexed pub_id);
     event publisher_added(uint indexed stream_id, address indexed pub_id);
@@ -89,6 +89,11 @@ contract pub{
         publisher[_id].address_publisher = address(0);
         publisher[_id].name = "";
         publisher[_id].access = new uint[](0);
+    }
+
+    function get_publisher(address _id) public view returns(string memory, address, uint[] memory){
+        require(publisher[_id].exist == true, "publisher does not exist");
+        return (publisher[_id].name, publisher[_id].address_publisher, publisher[_id].access);
     }
 
 }
