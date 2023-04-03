@@ -6,8 +6,7 @@
 /node_modules
 /package-lock.json
 /package.json
-
-
+/logs
 # next.js
 /.next/
 /out/
