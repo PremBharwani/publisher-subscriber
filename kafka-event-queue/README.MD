@@ -22,3 +22,6 @@ Run the subscriber:
 ```
 $ ./out/consumer kafka-sv.properties
 ```
+
+~
+Check [AIBlockchain] (https://github.com/ai-coin/KafkaBlockchain) for a tamper immune pub-sub blockchian architecture. Also resolves the workflow for on/off chain data.
