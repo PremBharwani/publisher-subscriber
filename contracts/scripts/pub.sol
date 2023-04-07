@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-import {EventQueue} from "./events.sol";
+// import {EventQueu} from "./events.sol";
 
 
 contract pub{
+
+    // this contract is stores information about all the publishers
+    // it can create a publisher.
+    // it also has the function to publish to an event stream
+    // it also has the function to add or remove a publisher from an event stream
+
 
     address owner;
     constructor() {
@@ -27,6 +33,7 @@ contract pub{
     event publisher_created(string indexed name, address indexed address_publisher);
     event publisher_removed(uint indexed stream_id, address indexed pub_id);
 
+    //create publisher allows users to create a publisher and it emits a publisher 
     function create_publisher(string memory _name, address _address_publisher,uint stream_id) public returns(uint){
         require(msg.sender == _address_publisher, "you are not allowed to create publisher with this address");
         publisher[_address_publisher] = publisher1(_name, _address_publisher, true, new uint[](0));
