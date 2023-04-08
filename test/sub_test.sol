@@ -20,10 +20,10 @@ contract TestSubCurrency {
         address subs_id = SUB.create_subscriber(this, new address[](0));
         Assert.equal(sub_id, address(this), "It should store the correct value");
 
-
+        string name;
         address subscriber_id ;
-        address[] event_streams_subscribed ;
-        (subscriber_id, event_streams_subscribed) = SUB.get_subscriber(address(this));
+        int[] event_streams_subscribed ;
+        (naeme, subscriber_id, event_streams_subscribed) = SUB.get_subscriber(address(this));
         Assert.equal(subscriber_id, address(this) ,"It should store the correct value");
 
     }
