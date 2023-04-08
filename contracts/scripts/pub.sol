@@ -54,6 +54,8 @@ contract pub{
         require(check == true, "publisher does not have access to this event");
         // publish_to_event_stream(stream_id, data);
         emit published(stream_id,pub_id);
+
+        //Issue - Implementation -> Data to be published to event stream 
         
     }
 
