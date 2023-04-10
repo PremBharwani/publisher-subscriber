@@ -28,11 +28,13 @@ contract subscriber_Functions {
         emit subscriber_limit_set(limit) ;
     }
 
+    subscriber[] subscribers;
     struct subscriber {
         string name;
         address subscriber_id ;
-        bool exist;
+        bool exists;
         uint[] event_streams_subscribed ; // stores address of events streams subscribed
+        // mapping(uint => int)  stack;
     }
 
     struct subscriber_stack{
@@ -40,18 +42,27 @@ contract subscriber_Functions {
         bool subscription;
     }
     
-    struct stream_collection{
-        mapping(uint => subscriber_stack)  lastseen_stack;
-        bool _isDeleted;
-    }
+    // struct stream_collection{
+    //     mapping(uint => subscriber_stack)  lastseen_stack;
+    //     bool _isDeleted;
+    // }
+
     mapping (address => subscriber) public subscriber_list;
-    mapping(address => mapping(uint => subscriber_stack)) subscription_map;
+    mapping(address => mapping(uint => subscriber_stack)) subscription_map;         // All subscribers <-> subscriptions
     // mapping(address =>  stream_collection) subscription_map ; // maps subscriber -> List[ his subscriptions ]
     //List[ subscriptions ] are stored as a mapping from event_stream_id -> lastseen_stack for each eventstream 
 
     
-    function create_subscriber(string memory _name, address _subscriber_id) public OwnerOnly returns(subscriber memory) {
-    	subscriber memory s = subscriber(_name, _subscriber_id, true, new uint[](0));
+    function create_subscriber(string memory _name, address _subscriber_id) internal OwnerOnly returns(subscriber memory){
+        // subscriber storage s = subscribers.push();
+        // s.name = _name; s.subscriber_id = _subscriber_id; s.exists = true; 
+        // s.event_streams_subscribed = new uint[](0);
+
+    	subscriber memory s = subscriber({
+                            name: _name,
+                            subscriber_id: _subscriber_id, 
+                            exists: true,
+                            event_streams_subscribed: new uint[](0)});
         subscriber_list[_subscriber_id] = s;
         emit subscriber_created(s.name, s.subscriber_id) ;
 	    return s;
@@ -59,17 +70,25 @@ contract subscriber_Functions {
 
 
     function delete_subscriber(address sub_id) public OwnerOnly {
-        require(subscriber_list[sub_id].exist == true, "publisher does not exist");
+        require(subscriber_list[sub_id].exists == true, "publisher does not exists");
         require(subscriber_list[sub_id].subscriber_id == msg.sender, "you are not allowed to delete this publisher");
-        subscriber_list[sub_id].exist = false;
+
+        //deleting from subscription map
+        subscriber memory s = subscriber_list[sub_id];
+        for(uint i = 0; i < s.event_streams_subscribed.length; i++){
+            uint stream_id_for_deletion = s.event_streams_subscribed[i];
+            delete subscription_map[sub_id][stream_id_for_deletion];
+        }
+        subscriber_list[sub_id].exists = false;
         subscriber_list[sub_id].name = "";
         subscriber_list[sub_id].subscriber_id = address(0);    // removing the address of subscriber
         subscriber_list[sub_id].event_streams_subscribed = new uint[](0); // clearing information of events_streams_subscribed
+
         emit subscriber_removed(subscriber_list[sub_id].subscriber_id) ;
     }
 
     function subscribe_to_eventstream(uint stream_id, address sub_id) public {
-        require(subscriber_list[sub_id].exist == true, "Subscriber does not exist");
+        require(subscriber_list[sub_id].exists == true, "Subscriber does not exists");
         require(subscriber_list[sub_id].subscriber_id == msg.sender, "you are not allowed to delete this publisher");
         
         // Issue left to resolve- Check whetehr the stream_id is valid
@@ -86,11 +105,12 @@ contract subscriber_Functions {
     }
 
     function unsubscribe_to_eventstream(uint stream_id, address sub_id) public OwnerOnly {
-        require(subscriber_list[sub_id].exist == true, "Subscriber does not exist");
+        require(subscriber_list[sub_id].exists == true, "Subscriber does not exists");
         require(subscriber_list[sub_id].subscriber_id == msg.sender, "you are not allowed to delete this publisher");
 
         subscription_map[sub_id][stream_id].last_seen_pos = -1;
         subscription_map[sub_id][stream_id].subscription = false;
+        delete subscription_map[sub_id][stream_id];
 
         uint i =0 ;
         while(subscriber_list[sub_id].event_streams_subscribed[i] != stream_id){
@@ -101,7 +121,7 @@ contract subscriber_Functions {
     }
 
     function get_subscriber(address sub_id) public view returns(string memory, address , uint[] memory){
-        require(subscriber_list[sub_id].exist == true, "subscriber does not exist");
+        require(subscriber_list[sub_id].exists == true, "subscriber does not exists");
         return (subscriber_list[sub_id].name, subscriber_list[sub_id].subscriber_id, subscriber_list[sub_id].event_streams_subscribed);
     }
 
