@@ -3,7 +3,7 @@ pragma solidity ^0.8.0 ;
 
 // to do: payable functions
 
-contract EventQueue {
+contract Events {
 
     // queue is actually a fixed size array
     // The idea is that each subscriber will have a variable lastSeenIndex for every topic it is subscribed to
