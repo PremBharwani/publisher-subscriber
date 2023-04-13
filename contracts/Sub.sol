@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity >= 0.8.2 <0.9.0;
 
 
@@ -20,6 +22,7 @@ contract Sub {
     event subscriber_removed(address subscriber_id) ;
     event subscribed_to_event(address subscriber_id , address event_stream_id) ;
     event unsubscribed_to_event(address subscriber_id , address event_stream_id) ;
+    event requested_for_events(address subscriber_id, uint event_stream_id);
 
 // setting up limit of event stream subscription
 
@@ -71,6 +74,53 @@ contract Sub {
         emit unsubscribed_to_event(s.subscriber_id, event_stream_id) ;
     }
 
-    
+    bool private relay_eventsCalled = false;
+    // uint private max_events_at_a_time=100;
+    string[100] private ret_events ; // keeping a dynamic array will increase gas usage (clearing the array). Just overwrite
+    uint private filled_till;
+
+    struct events_data {
+        string[100] events;
+        uint last_index;
+    }
+
+    function get_events(uint stream_id, address sub_id) public returns (events_data memory){
+        
+        // check if the sub can actually access the queue (or check on the server)
+
+        // emit saying the sub needs the events in the particular stream
+        emit requested_for_events(sub_id, stream_id);
+
+        // wait until relay_events() is called
+
+        while(!relay_eventsCalled){
+            //wait
+        }
+
+        relay_eventsCalled=false;
+        events_data memory ev;
+        ev.events=ret_events;
+        ev.last_index=filled_till;
+
+        return ev;
+
+    }
+
+    function relay_events(string[] memory events) public {
+        // this function will be called from the js script (which gets the  data from the go script)
+
+        // need to return this data to the call that called get_events()
+        
+        uint i=0;
+        for(; i<events.length; i++){
+            ret_events[i]=events[i];
+        }
+
+        filled_till=i-1;
+        relay_eventsCalled=true;
+        return;
+
+    }
+
 
 }
