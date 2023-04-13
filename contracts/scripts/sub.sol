@@ -105,5 +105,40 @@ contract subscriber_Functions {
         return (subscriber_list[sub_id].name, subscriber_list[sub_id].subscriber_id, subscriber_list[sub_id].event_streams_subscribed);
     }
 
+    bool private relay_eventsCalled = false;
+    // uint private max_events_at_a_time=100;
+    string[100] private ret_events ;
+    uint private filled_till;
+
+    function get_events(uint stream_id, address sub_id) public returns (string[100] memory){
+        // emit saying the sub needs the events in the particular stream
+
+        // wait until relay_events() is called
+
+        while(!relay_eventsCalled){
+            //wait
+        }
+
+        relay_eventsCalled=false;
+
+        return ret_events;
+
+    }
+
+    function relay_events(string[] memory events) public {
+        // this function will be called from the js script (which gets the  data from the go script)
+
+        // need to return this data to the call that called get_events()
+        uint i=0;
+        for(; i<events.length; i++){
+            ret_events[i]=events[i];
+        }
+
+        filled_till=i-1;
+        relay_eventsCalled=true;
+        return;
+
+    }
+
 
 }
