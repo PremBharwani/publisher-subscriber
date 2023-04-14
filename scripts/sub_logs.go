@@ -80,7 +80,7 @@ func main() {
 
 		var event2 subscriber_created
 
-		err2 := contractABI.UnpackIntoInterface(&event2, "subscriber_created", vLog.Data)
+		err2 := contractABI.UnpackIntoInterface(&event2, "subscriber_creted", vLog.Data)
 		if err2 == nil {
 			fmt.Printf(event2.SubscriberAddress.Hex())
 			fmt.Printf("\n")
