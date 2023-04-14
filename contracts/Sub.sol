@@ -65,7 +65,7 @@ contract Sub {
 
     function subscribe_to_event(address event_stream_id, address add) public OwnerOnly{
         require( event_stream_iterator_map[addr_to_sub[add].subscriber_id][event_stream_id].event_exists==false , "Subscriber Has already Subscribed To This Event"); // chec
-
+        require(addr_to_sub[add].event_streams_subscribed.length<event_subscribe_limit,"Subscription limit reached");
         event_stream_iterator_map[addr_to_sub[add].subscriber_id][event_stream_id] = Event_Stream_Iterator(0, true);
         addr_to_sub[add].event_streams_subscribed.push(event_stream_id);
         emit subscribed_to_event(addr_to_sub[add].subscriber_id, event_stream_id);
