@@ -12,14 +12,6 @@ type ApiRequestJson struct {
 	Action            string `json:"action"`// binding:"required"`
 }
 
-type EventJson struct {
-	BootStrapServers string `json:"bootStrapServers"`
-	UserWalletAddress string `json:"userWalletAddress"`
-	EventQueueID string `json:"eventQueueId"`
-	Message string `json:"message"`
-}
-
-
 func main() {
 	
 	r := gin.Default()
@@ -165,25 +157,6 @@ func main() {
 			fmt.Println("Error in binding the json: ", err)
 		}
 	})
-
-	r.POST("/publish-event", func(c *gin.Context){
-		var json EventJson
-		if err:=c.BindJSON(&json); err == nil {
-			res := publish_event_to_kafka(json.BootStrapServers, json.EventQueueID, json.Message)
-			if(res){
-				c.JSON(200, gin.H{
-					"message": fmt.Sprintf("Published event to kafka"),
-				})
-			}else{
-				c.JSON(400, gin.H{
-					"message": fmt.Sprintf("Failed to publish event to kafka"),
-				})
-			}
-		}else{
-			fmt.Println("Error in binding the json: ", err)
-		}
-	})
-	
 
 	initializeLists() // Initialize the access list & the unique event queue MAPS ( Because GOLANG map implementation needs us to initialize the map before using it)
 	
