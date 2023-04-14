@@ -15,15 +15,15 @@ contract Sub {
     }
     uint public event_subscribe_limit = 0 ;
    
-    event subscriber_limit_set(uint limit) ;
+    event subscriber_limit_set(uint256 limit) ;
     event subscriber_created(address subscriber_id) ;
     event subscriber_removed(address subscriber_id) ;
-    event subscribed_to_event(address subscriber_id , address event_stream_id) ;
-    event unsubscribed_to_event(address subscriber_id , address event_stream_id) ;
+    event subscribed_to_event(address subscriber_id , string event_stream_id) ;
+    event unsubscribed_to_event(address subscriber_id , string event_stream_id) ;
 
 // setting up limit of event stream subscription
 
-    function set_limit(uint limit) public OwnerOnly {
+    function set_limit(uint256 limit) public OwnerOnly {
         event_subscribe_limit = limit ; 
         emit subscriber_limit_set(limit) ;
     }
@@ -60,6 +60,8 @@ contract Sub {
     }
 
 
+    function subscribed_to_event()
+
     function unsubscribe_to_event(address event_stream_id, Subscriber memory s) public OwnerOnly {
         require( event_stream_iterator_map[s.subscriber_id][event_stream_id].event_exists , "Subscriber Has Not Subscribed To This Event"); // checking if the event has been subscribed        uint i = 0;
         uint i =0 ;
@@ -74,3 +76,4 @@ contract Sub {
     
 
 }
+
