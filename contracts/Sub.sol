@@ -86,8 +86,6 @@ contract Sub {
 
     function get_events(uint stream_id, address sub_id) public returns (events_data memory){
         
-        // check if the sub can actually access the queue (or check on the server)
-
         // emit saying the sub needs the events in the particular stream
         emit requested_for_events(sub_id, stream_id);
 
