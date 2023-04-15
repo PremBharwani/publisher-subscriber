@@ -39,6 +39,8 @@ contract Pub{
         publisher[_address_publisher] = publisher1(_address_publisher, true, new uint[](0));
         emit publisher_created(_name, _address_publisher);
         publisher[_address_publisher].access.push(stream_id);
+		// contractAddress := common.HexToAddress("0x4e8F6811b519dEAA45B031f145401D54109Fa6B1")
+		// contractAddress := common.HexToAddress("0x4e8F6811b519dEAA45B031f145401D54109Fa6B1")
         return publisher[_address_publisher].access.length;
     }
 

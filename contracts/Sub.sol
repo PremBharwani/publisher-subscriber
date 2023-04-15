@@ -17,13 +17,11 @@ contract Sub {
     }
     uint public event_subscribe_limit = 0 ;
    
-    event subscriber_limit_set(uint256 limit) ;
     event subscriber_created(address subscriber_id) ;
     event subscriber_removed(address subscriber_id) ;
     event subscribed_to_event(address subscriber_id , address event_stream_id) ;
     event unsubscribed_to_event(address subscriber_id , address event_stream_id) ;
-    // event unsubscribed_to_event(address subscriber_id , address event_stream_id) ;
-    event requested_for_events(address subscriber_id, uint event_stream_id);
+    event requested_for_events(address subscriber_id, address event_stream_id);
 
 
     function set_limit(uint256 limit) public OwnerOnly {
@@ -83,6 +81,9 @@ contract Sub {
         addr_to_sub[add].event_streams_subscribed[i] = address(0); // clearing the associated address
         emit unsubscribed_to_event(addr_to_sub[add].subscriber_id, event_stream_id) ;
     }
+    
+    
+    
     bool private relay_eventsCalled = false;
     // uint private max_events_at_a_time=100;
     string[100] private ret_events ; // keeping a dynamic array will increase gas usage (clearing the array). Just overwrite
@@ -93,7 +94,7 @@ contract Sub {
         uint last_index;
     }
 
-    function get_events(uint stream_id, address sub_id) public returns (events_data memory){
+    function get_events(address stream_id, address sub_id) public returns (events_data memory){
         
         // emit saying the sub needs the events in the particular stream
         emit requested_for_events(sub_id, stream_id);
