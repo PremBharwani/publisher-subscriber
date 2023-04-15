@@ -4,7 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../contracts/pub.sol";
+import "../contracts/Pub.sol";
 
 contract TestPubCurrency {
 
