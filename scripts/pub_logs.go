@@ -30,19 +30,30 @@ func listen_pub_logs(logs []types.Log, LastBlockId *big.Int ) *big.Int{
 
 	for _, vLog := range logs {
 
-		eventArgs := make(map[string]interface{})
-		err := pubAbi.UnpackIntoMap(eventArgs, "publisher_created", vLog.Data)
-		if err!=nil{
-			fmt.Printf("Error In Unpacking \n")
-		}
+		// eventArgs := make(map[string]interface{})
+		// err := pubAbi.UnpackIntoMap(eventArgs, "publisher_created", vLog.Data)
+		// if err!=nil{
+		// 	fmt.Printf("Error In Unpacking \n")
+		// }
 	
 		switch vLog.Topics[0] {
 			
 			case hash_pub_created:
+				eventArgs := make(map[string]interface{})
+				err := pubAbi.UnpackIntoMap(eventArgs, "publisher_created", vLog.Data)
+				if err!=nil{
+					fmt.Printf("Error In Unpacking \n")
+				}
 				// pub_id := eventArgs["pub_id"].(common.Address)
-				val := make_dynamic_api_call("POST", "http://localhost:8080/create-user", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["subscriber_id"]) )
+				val := make_dynamic_api_call("POST", "http://localhost:8080/create-user", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["pub_id"] ) )
 				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 			case hash_pub_added:
+				eventArgs := make(map[string]interface{})
+				err := pubAbi.UnpackIntoMap(eventArgs, "publisher_added", vLog.Data)
+				if err!=nil{
+					fmt.Printf("Error In Unpacking \n")
+				}
+				// fmt.Printf("pub_id: %s | stream_id: %s\n", eventArgs["pub_id"], eventArgs["stream_id"])
 				val := make_dynamic_api_call("POST", "http://localhost:8080/add-user-access", fmt.Sprintf("{\"userWalletAddress\": \"%s\",\"eventQueueId\": \"%s\",\"action\": \"publish\"}", eventArgs["pub_id"], eventArgs["stream_id"]) )
 				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 				// pub_id := eventArgs["pub_id"].(common.Address)
@@ -50,6 +61,11 @@ func listen_pub_logs(logs []types.Log, LastBlockId *big.Int ) *big.Int{
 				// fmt.Printf("Publisher Added : %s \n", pub_id.Hex())
 
 			case hash_pub_removed:
+				eventArgs := make(map[string]interface{})
+				err := pubAbi.UnpackIntoMap(eventArgs, "publisher_removed", vLog.Data)
+				if err!=nil{
+					fmt.Printf("Error In Unpacking \n")
+				}
 				val := make_dynamic_api_call("POST", "http://localhost:8080/remove-user-access", fmt.Sprintf("{\"userWalletAddress\": \"%s\",\"eventQueueId\": \"%s\",\"action\": \"publish\"}", eventArgs["pub_id"], eventArgs["stream_id"]) )
 				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 
@@ -59,12 +75,22 @@ func listen_pub_logs(logs []types.Log, LastBlockId *big.Int ) *big.Int{
 				
 			
 			case hash_pub_deleted:
+				eventArgs := make(map[string]interface{})
+				err := pubAbi.UnpackIntoMap(eventArgs, "publisher_deleted", vLog.Data)
+				if err!=nil{
+					fmt.Printf("Error In Unpacking \n")
+				}
 				val := make_dynamic_api_call("POST", "http://localhost:8080/remove-subscriber-access", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["pub_id"]) )
 				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 				// pub_id := eventArgs["pub_id"].(common.Address)
 				// fmt.Printf("Publisher Deleted : %s \n", pub_id.Hex())
 			
 			case hash_pub_data:
+				eventArgs := make(map[string]interface{})
+				err := pubAbi.UnpackIntoMap(eventArgs, "published_data", vLog.Data)
+				if err!=nil{
+					fmt.Printf("Error In Unpacking \n")
+				}
 				val := make_dynamic_api_call("POST", "http://localhost:8080/publish-event", fmt.Sprintf("{\"userWalletAddress\": \"%s\",\"eventQueueId\": \"%s\",\"message\": \"%s\"}", eventArgs["pub_id"], eventArgs["stream_id"], eventArgs["data"]) )
 				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 				// pub_id := eventArgs["pub_id"].(common.Address)

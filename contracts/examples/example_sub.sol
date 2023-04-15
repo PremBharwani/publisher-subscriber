@@ -26,9 +26,9 @@ contract example_sub{
         mySub.subscribe_to_event(5, 0xa8A2e80a87e71412635bBaD9D413acccDB7aFFBE); //add event access to subscriber
     }
 
-    function test_call_for_events() public{
-        mySub.call_for_events(5, 0xa8A2e80a87e71412635bBaD9D413acccDB7aFFBE);   // through this  fucntion get events
-    }
+    // function test_get_events() public{
+    //     mySub.get_events(5, 0xa8A2e80a87e71412635bBaD9D413acccDB7aFFBE);   // through this  fucntion get events
+    // }
 
     function test_unsubscribe_to_event() public{
         mySub.unsubscribe_to_event(5, 0xa8A2e80a87e71412635bBaD9D413acccDB7aFFBE);  // remove event access from subscriber

@@ -25,18 +25,25 @@ func listen_event_logs(logs []types.Log, LastBlockId *big.Int) *big.Int {
 
 	for _, vLog := range logs {
 
-		eventArgs := make(map[string]interface{})
-
-		err1 := contractQueueABI.UnpackIntoMap(eventArgs, "topic_added", vLog.Data)
-		if err1 != nil {
-			log.Fatal(err1)
-		}
+		
 
 		if vLog.Topics[0] == CalculateHash("topic_added(uint256)") {
+			eventArgs := make(map[string]interface{})
+
+			err1 := contractQueueABI.UnpackIntoMap(eventArgs, "topic_added", vLog.Data)
+			if err1 != nil {
+				log.Fatal(err1)
+			}
 			val := make_dynamic_api_call("POST", "http://localhost:8080/create-topic", fmt.Sprintf("{\"userWalletAddress\": \"%s\", \"eventQueueId\":\"%s\"}", "lmao", eventArgs["stream_id"]))
 			fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 			
 		} else if vLog.Topics[0] == CalculateHash("topic_deleted(uint256))") {
+			eventArgs := make(map[string]interface{})
+
+			err1 := contractQueueABI.UnpackIntoMap(eventArgs, "topic_deleted", vLog.Data)
+			if err1 != nil {
+				log.Fatal(err1)
+			}
 			val := make_dynamic_api_call("POST", "http://localhost:8080/delete-topic", fmt.Sprintf("{\"userWalletAddress\": \"%s\", \"eventQueueId\":\"%s\"}", "lmao", eventArgs["stream_id"]))
 			fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 		}
