@@ -4,21 +4,12 @@ Now start the Kafka broker with the new `docker compose` command:
 ```
 $ docker compose up -d
 ```
-## Publishing & Subscribing
-Try and run this basic skeleton of Pub-Sub Event Queue:
 
-Compile the publisher & subscriber:
+## Gin Server
+
+Install & setup the dependencies then run the server: 
 ```
-$ go build -o out/producer util.go producer.go
-$ go build -o out/producer util.go consumer.go
+$ go run *
 ```
 
-Run the publisher:
-```
-$ ./out/producer kafka-sv.properties
-``` 
-
-Run the subscriber:
-```
-$ ./out/consumer kafka-sv.properties
-```
+`server.go` will serve as the gin server to facilitate any requests to add/remove users or event queues to the server's knowledge. It will also facilitate the addition/removal of user's access to event queues. 
