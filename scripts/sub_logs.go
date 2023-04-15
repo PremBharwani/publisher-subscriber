@@ -1,10 +1,16 @@
 package main
-
+/*
+Sub.deployed().then(function (i){add=i})
+add.create_subscriber('0x31457f8735078c621a672E849A945d10DF364136')
+*/
 import (
 	"context"
 	"fmt"
 	"log"
-
+	"time"
+	// "net/http"
+	// "io/ioutil"
+	// "bytes"
 	"math/big"
 	"strings"
 
@@ -38,13 +44,13 @@ func main() {
 
 	// contractQueueABI, err := abi.JSON(strings.NewReader(abi_string_queue))
 	// if err != nil {
-	// 	fmt.Printf("Error In Reading Event Queue ABI \n")
+	// 	fmt.Printf("Error In Reading Event Queue ABI 	\n")
 	// }
 
-	sub_contract_address := common.HexToAddress("0xF0Dd6d22b59DB5325Dae833d87b1a683b27D702D")
+	sub_contract_address := common.HexToAddress("0xea63dcD4Df41C7815D013B7Ea9Cc071Fcd1F101c")
 	// event_contract_address := "0x0f10024fb7415240861C78535166Df909272A37C"
 
-	LastBlockId := big.NewInt(0)
+	LastBlockId := big.NewInt(15)
 
 	for {
 
@@ -76,9 +82,9 @@ func main() {
 				err1 := contractSubABI.UnpackIntoMap(eventArgs, "subscriber_created", vLog.Data)
 				if err1 != nil {
 					log.Fatal(err1)
-				} else {
-					// call api here
-					// subscriber_id
+				} else {					
+					val := make_dynamic_api_call("POST", "http://localhost:8080/create-user", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["subscriber_id"]) )
+					fmt.Printf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), val)
 				}
 			}
 
@@ -133,6 +139,8 @@ func main() {
 					log.Fatal(err1)
 				} else {
 					// call api here
+
+					// var1 : = make_api_call("http://localhost:8080/create-user", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["subscriber_id"]) )
 					// subscriber_id
 					// event_stream_id
 				}

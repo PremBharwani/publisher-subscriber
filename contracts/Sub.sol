@@ -12,14 +12,11 @@ contract Sub {
     
     constructor() {
         owner = msg.sender;
-
-        // uncomment these lines to test 'Oracle' thingy
-
-        // address test_addr = 0xc0ffee254729296a45a3885639AC7E10F9d54979;
-        // relay_eventsCalled[test_addr]=false;
-        // filled_till[test_addr]=0;
-        // string[50] memory m; 
-        // ret_events[test_addr]=m;
+        address test_addr = 0xc0ffee254729296a45a3885639AC7E10F9d54979;
+        relay_eventsCalled[test_addr]=false;
+        filled_till[test_addr]=0;
+        string[50] memory m; 
+        ret_events[test_addr]=m;
 
     }
     
@@ -128,7 +125,6 @@ contract Sub {
         events_data memory ev;
         ev.events=ret_events[sub_id];
         ev.last_index=filled_till[sub_id];
-
         return ev;
 
     }
@@ -146,8 +142,8 @@ contract Sub {
         }
 
         filled_till[sub_id]=i-1;
-        // relay_events_called=true ;
-        // checkEvent = events[0];
+        relay_events_called=true ;
+        checkEvent = events[0];
         relay_eventsCalled[sub_id]=true;
         return;
 
