@@ -14,16 +14,18 @@ contract Events {
     event topic_deleted(uint stream_id);
     mapping (uint => address) public owners; //owner of the topic
     
-    function add_topic() public {
+    function add_topic() public returns (uint){
         num_queues++;
         owners[num_queues]=msg.sender;
         emit topic_added(num_queues);
+        return num_queues;
     }
 
-    function delete_topic(uint _topic_id) public {
+    function delete_topic(uint _topic_id) public returns (uint){
         require(owners[_topic_id]==msg.sender, "You are not authorized to delete this queue!");
         delete owners[_topic_id];
         emit topic_deleted(_topic_id);
+        return num_queues;
     }
 
 }
