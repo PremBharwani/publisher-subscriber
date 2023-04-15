@@ -61,7 +61,8 @@ contract TestPubCurrency {
         PUB.create_publisher(address(this));
         PUB.add_publisher(stream_id, address(this));
         uint[] memory access;
-         bool check= false;
+        access = PUB.get_publisher(address(this));
+        bool check= false;
         for(uint i = 0; i < access.length; i++){
             if(access[i] == stream_id){
                 check = true;
@@ -79,7 +80,7 @@ contract TestPubCurrency {
         PUB.create_publisher(address(this));
         PUB.add_publisher(stream_id, address(this));
         uint[] memory access = PUB.get_publisher(address(this));
-         bool check= false;
+        bool check= false;
         for(uint i = 0; i < access.length; i++){
             if(access[i] == stream_id){
                 check = true;
