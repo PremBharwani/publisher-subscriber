@@ -9,11 +9,11 @@
 // There can be several other ways also to use the publisher contract according to the user's need
 
 pragma solidity >=0.7.0 <0.9.0;
-import {Pub} from "./Pub.sol";     // through this way we can import the publisher contract
+import {Pub} from "../Pub.sol";     // through this way we can import the publisher contract
 
 
 
-contract test{
+contract example_pub{
 
     Pub public myPub;    // This line declares the instance of publisher contract
     constructor(){
