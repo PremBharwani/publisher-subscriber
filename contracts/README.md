@@ -42,7 +42,13 @@ struct events_data {
 
 The events are filled from `index=0` to `index=last_index` in that order. Currently, we have hardcoded 50 events at a time, this limit can be changed easily. 
 
+## Callable Functions supported in `Events.sol`
 
+`add_topic() returns (uint)`
+
+`delete_topic(uint _topic_id)`
+
+Get the `topic_id` / `stream_id` by calling `add_topic()` and use that to call the publisher and subscriber functions given above that require `stream_id`. 
 
 
 
