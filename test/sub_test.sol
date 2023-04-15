@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
@@ -8,11 +9,11 @@ import "../contracts/scripts/sub.sol";
 
 contract TestSubCurrency {
 
-    sub public SUB;
+    Sub public SUB;
 
     // Run before every test function
     function beforeEach() public {
-        SUB = new sub();
+        SUB = new Sub();
     }
 
 
