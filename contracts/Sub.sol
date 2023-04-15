@@ -96,6 +96,11 @@ contract Sub {
         }
     }
 
+    function get_subscriber(address sub_id) public view returns( uint[] memory){
+        require(subscriber_list[sub_id].exist == true, "subscriber does not exist" );
+        return (subscriber_list[sub_id].access);
+    }
+
 
     struct events_data {
         string[50] events;
@@ -105,11 +110,7 @@ contract Sub {
     bool public relay_events_called = false ;
     string public checkEvent;
 
-<<<<<<< Updated upstream
     function call_for_events(uint stream_id, address sub_id) public {
-=======
-    function get_events(uint256 stream_id, address sub_id) public returns (events_data memory){
->>>>>>> Stashed changes
         
         relay_eventsCalled[sub_id]=false;
         filled_till[sub_id]=0;

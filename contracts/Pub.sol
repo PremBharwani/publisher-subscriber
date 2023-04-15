@@ -10,7 +10,7 @@ contract Pub{
     // it can create a publisher.
     // it also has the function to publish to an event stream
     // it also has the function to add or remove a publisher from an event stream
-0xe1845AC58A2060937227768a91C635Dce4987eb9
+
 
     address owner;
     constructor() {

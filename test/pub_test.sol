@@ -24,13 +24,35 @@ contract TestPubCurrency {
 
     }
 
-    // Test that it adds publisher to access
+    // Test to give publisher access to stream_id
     function test_add_publisher() public{
         uint stream_id = 7;
         PUB.create_publisher(address(this));
         PUB.add_publisher(stream_id, address(this));
         uint[] memory access = PUB.get_publisher(address(this));
-        Assert.equal(access[stream_id], true, "Adding publisher to stream_id successful");
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding publisher to stream_id successful");
+    }
+
+    //Test whether publishing to stream was successful
+    function test_publish_to_eventstream() public {
+        uint stream_id = 7;
+        PUB.create_publisher(address(this));
+        PUB.add_publisher(stream_id, address(this));
+        uint[] memory access = PUB.get_publisher(address(this));
+         bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding publisher to stream_id successful");
+        PUB.publish_to_eventstream("example", stream_id, address(this));
     }
 
     //Test to check remove_publisher
@@ -39,8 +61,13 @@ contract TestPubCurrency {
         PUB.create_publisher(address(this));
         PUB.add_publisher(stream_id, address(this));
         uint[] memory access;
-        access = PUB.get_publisher(address(this));
-        Assert.equal(access[stream_id], true, "Adding publisher to stream_id successful");
+         bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding publisher to stream_id successful");
         PUB.remove_publisher(2, address(this));
         Assert.equal(access[stream_id], 0, "Removing publisher unsuccesful");
     }
@@ -52,7 +79,14 @@ contract TestPubCurrency {
         PUB.create_publisher(address(this));
         PUB.add_publisher(stream_id, address(this));
         uint[] memory access = PUB.get_publisher(address(this));
-        Assert.equal(access[stream_id], true, "Adding publisher to stream_id successful");
+         bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding publisher to stream_id successful");
+        PUB.delete_publisher(address(this));
         access = PUB.get_publisher(address(this));
         Assert.equal(access.length, 0, "Publisher Deletion unsuccessful");
     }

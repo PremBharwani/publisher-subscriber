@@ -18,9 +18,9 @@ contract TestSubCurrency {
 
     //function to test create subscriber
     function test_create_subscriber() public {
-        SUB.create_subscriber(address(int));
+        SUB.create_subscriber(address(this));
         uint[] memory access;
-        access = SUB.get_subscriber(address(int));
+        access = SUB.get_subscriber(address(this));
     }
 
     //function to add a subscriber to an event stream
@@ -29,7 +29,13 @@ contract TestSubCurrency {
         SUB.create_subscriber(address(this));
         SUB.subscribe_to_event(stream_id, address(this));
         uint[] memory access = SUB.get_subscriber(address(this));
-        Assert.equal(access[stream_id], true, "Adding subscriber to stream_id successful");
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding subscriber to stream_id successful");
     }
 
     //function to remove a subscriber from an event stream
@@ -39,8 +45,14 @@ contract TestSubCurrency {
         SUB.subscribe_to_event(stream_id, address(this));
         uint[] memory access;
         access = SUB.get_subscriber(address(this));
-        Assert.equal(access[stream_id], true, "Adding subscriber to stream_id successful");
-        SUB.unsubscribe_to_event(2, address(this));
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding subscriber to stream_id successful");
+        SUB.unsubscribe_to_event(stream_id, address(this));
         Assert.equal(access[stream_id], 0, "Removing subscriber unsuccesful");
     }
 
@@ -50,8 +62,16 @@ contract TestSubCurrency {
         SUB.create_subscriber(address(this));
         SUB.subscribe_to_event(stream_id, address(this));
         uint[] memory access = SUB.get_subscriber(address(this));
-        Assert.equal(access[stream_id], true, "Adding subscriber to stream_id successful");
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding subscriber to stream_id successful");
+        SUB.delete_subscriber(address(this));
         access = SUB.get_subscriber(address(this));
         Assert.equal(access.length, 0, "Subscriber Deletion unsuccessful");
     }
+
 }
