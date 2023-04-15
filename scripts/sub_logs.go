@@ -79,7 +79,7 @@ func listen_sub_logs(logs []types.Log, LastBlockId *big.Int) *big.Int {
 					// event_stream_id
 				}
 
-			case CalculateHash("requested_for_events(address,address)") :
+			case CalculateHash("requested_for_events(uint,address)") :
 				err1 := contractSubABI.UnpackIntoMap(eventArgs, "requested_for_events", vLog.Data)
 				if err1 != nil {
 					log.Fatal(err1)
