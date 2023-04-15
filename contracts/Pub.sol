@@ -73,7 +73,7 @@ contract Pub{
             }
         }
         require(check == false, "publisher already has access to this event");
-        require(publisher_list[pub_id].access.length<event_publish_limit,"Subscription limit reached");
+        require(publisher_list[pub_id].access.length<event_publish_limit,"Publishing limit reached");
 
         publisher_list[pub_id].access.push(stream_id);
         emit publisher_added(pub_id, stream_id);
