@@ -28,21 +28,22 @@ contract pub{
     }
     mapping (address => publisher) public publisher_list;
 
-    event published(uint indexed stream_id, address indexed pub_id);
-    event publisher_added(uint indexed stream_id, address indexed pub_id);
-    event publisher_created(string indexed name, address indexed address_publisher);
-    event publisher_removed(uint indexed stream_id, address indexed pub_id);
+    event publisher_created(address pub_id);
+    event published_data(address pub_id, uint256 stream_id, string data);
+    event publisher_added(address pub_id, uint256 stream_id);
+    event publisher_removed(address pub_id, uint256 stream_id);
+    event publisher_deleted(address pub_id);
+    
 
     //create publisher allows users to create a publisher and it emits a publisher 
-    function create_publisher(string memory _name, address _address_publisher,uint stream_id) public returns(uint){
+    function create_publisher(string memory _name, address _address_publisher) public{
         require(msg.sender == _address_publisher, "you are not allowed to create publisher with this address");
+        require(publisher_list[_address_publisher].exist == false, "publisher already exist");
         publisher_list[_address_publisher] = publisher(_name, _address_publisher, true, new uint[](0));
-        emit publisher_created(_name, _address_publisher);
-        publisher_list[_address_publisher].access.push(stream_id);
-        return publisher_list[_address_publisher].access.length;
+        emit publisher_created(_address_publisher);
     }
 
-    function publish_to_eventstream(bytes32 data, uint stream_id, address pub_id) public{
+    function publish_to_eventstream(string memory data, uint stream_id, address pub_id) public{
         require(publisher_list[pub_id].exist == true, "publisher does not exist");
         require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to publish to this event");
         bool check= false;
@@ -52,8 +53,7 @@ contract pub{
             }
         }
         require(check == true, "publisher does not have access to this event");
-        // publish_to_event_stream(stream_id, data);
-        emit published(stream_id,pub_id);
+        emit published_data(pub_id, stream_id, data);
 
         //Issue - Implementation -> Data to be published to event stream 
         
@@ -70,7 +70,7 @@ contract pub{
         }
         require(check == false, "publisher already has access to this event");
         publisher_list[pub_id].access.push(stream_id);
-        emit publisher_added(stream_id,pub_id);
+        emit publisher_added(pub_id, stream_id);
     }
 
     function remove_publisher(uint stream_id,address pub_id) public {
@@ -88,9 +88,9 @@ contract pub{
                 publisher_list[pub_id].access[i] = 0;
             }
         }
-        emit publisher_removed(stream_id,pub_id);
-    
+        emit publisher_removed(pub_id, stream_id);
     }
+
     function delete_publisher(address _id) public onlyOwner {
         require(publisher_list[_id].exist == true, "publisher does not exist");
         require(publisher_list[_id].address_publisher == msg.sender, "you are not allowed to delete this publisher");
@@ -98,6 +98,7 @@ contract pub{
         publisher_list[_id].address_publisher = address(0);
         publisher_list[_id].name = "";
         publisher_list[_id].access = new uint[](0);
+        emit publisher_deleted(_id);
     }
 
     function get_publisher(address pub_id) public view returns(string memory, address, uint[] memory){
