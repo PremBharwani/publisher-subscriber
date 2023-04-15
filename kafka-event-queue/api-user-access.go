@@ -67,6 +67,28 @@ func removeUserAccess(c *gin.Context){//* Removes access for the user to the top
 	}	
 }
 
+func removePublisherAccess(c *gin.Context){//* Removes the publisher access for the user to all topics
+	var json ApiRequestJson
+	if err:=c.BindJSON(&json); err!=nil{
+		fmt.Println("Error binding JSON!")
+		c.JSON(400, gin.H{"error": err.Error()})
+	}else{
+		accessListMap[json.UserWalletAddress].PublisherAccess = []string{}
+		c.JSON(200, gin.H{"message": fmt.Sprintf("User with wallet address [%s] removed access to all topics as publisher", json.UserWalletAddress)})
+	}
+}
+
+func removeSubscriberAccess(c *gin.Context){//* Removes the subscriber access for the user to all topics
+	var json ApiRequestJson
+	if err:=c.BindJSON(&json); err!=nil{
+		fmt.Println("Error binding JSON!")
+		c.JSON(400, gin.H{"error": err.Error()})
+	}else{
+		accessListMap[json.UserWalletAddress].SubscriberAccess = []string{}
+		c.JSON(200, gin.H{"message": fmt.Sprintf("User with wallet address [%s] removed access to all topics as subscriber", json.UserWalletAddress)})
+	}
+}
+
 func listUserAccess(c *gin.Context){
 	// Return accessListMap as JSON
 	c.JSON(200, gin.H{"userAccessListMap": accessListMap})

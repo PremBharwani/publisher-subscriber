@@ -25,6 +25,10 @@ func main(){
 	r.POST("/create-topic", createTopic)
 	r.DELETE("/delete-topic", deleteTopic)
 
+	// Calls to remove publisher or subscriber access of a user compeletely
+	r.POST("/remove-publisher-access", removePublisherAccess)
+	r.POST("/remove-subscriber-access", removeSubscriberAccess)
+
 	// Calls to control access of users to various topics
 	r.POST("/add-user-access", addUserAccess)
 	r.DELETE("/remove-user-access", removeUserAccess)

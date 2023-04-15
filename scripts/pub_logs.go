@@ -1,9 +1,10 @@
-package scripts
+package main
 
 import (
 	"fmt"
 	"log"
 	"math/big"
+	"time"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -18,7 +19,8 @@ func listen_pub_logs(logs []types.Log, LastBlockId *big.Int ) *big.Int{
 	hash_pub_data := CalculateHash("published_data(address,uint256,string)")
 
 
-	pubabistring:="[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"}],\"name\":\"published_data\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"}],\"name\":\"publisher_added\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"publisher_created\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"publisher_deleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"}],\"name\":\"publisher_removed\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"add_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"_address_publisher\",\"type\":\"address\"}],\"name\":\"create_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_id\",\"type\":\"address\"}],\"name\":\"delete_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_id\",\"type\":\"address\"}],\"name\":\"get_publisher\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"pub_to_event\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"publisher\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"address_publisher\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"exist\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"remove_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+	
+	pubabistring := "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"}],\"name\":\"published_data\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"}],\"name\":\"publisher_added\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"publisher_created\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"publisher_deleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"}],\"name\":\"publisher_removed\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"add_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address_publisher\",\"type\":\"address\"}],\"name\":\"create_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_id\",\"type\":\"address\"}],\"name\":\"delete_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"event_publish_limit\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"get_publisher\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"data\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"publish_to_eventstream\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"publisher_list\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"exist\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"stream_id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"pub_id\",\"type\":\"address\"}],\"name\":\"remove_publisher\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"limit\",\"type\":\"uint256\"}],\"name\":\"set_limit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 	pubAbi, err := abi.JSON(strings.NewReader(pubabistring))
     if err != nil {
         log.Fatal(err)
@@ -27,58 +29,47 @@ func listen_pub_logs(logs []types.Log, LastBlockId *big.Int ) *big.Int{
 
 
 	for _, vLog := range logs {
+
+		eventArgs := make(map[string]interface{})
+		err := pubAbi.UnpackIntoMap(eventArgs, "publisher_created", vLog.Data)
+		if err!=nil{
+			fmt.Printf("Error In Unpacking \n")
+		}
 	
 		switch vLog.Topics[0] {
 			
 			case hash_pub_created:
-				event := make(map[string]interface{})
-				err := pubAbi.UnpackIntoMap(event, "publisher_created", vLog.Data)
-				if err != nil {
-					fmt.Printf("Error In Unpacking \n")
-				}
-				// pub_id := event["pub_id"].(common.Address)
-			
+				// pub_id := eventArgs["pub_id"].(common.Address)
+				val := make_dynamic_api_call("POST", "http://localhost:8080/create-user", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["subscriber_id"]) )
+				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
 			case hash_pub_added:
-				// fmt.Printf("xx")
-				event := make(map[string]interface{})
-				err := pubAbi.UnpackIntoMap(event, "publisher_added", vLog.Data)
-				if err != nil {
-					fmt.Printf("Error In Unpacking \n")
-				}
-				// pub_id := event["pub_id"].(common.Address)
-				// stream_id := event["stream_id"].(*big.Int)
+				val := make_dynamic_api_call("POST", "http://localhost:8080/add-user-access", fmt.Sprintf("{\"userWalletAddress\": \"%s\",\"eventQueueId\": \"%s\",\"action\": \"publish\"}", eventArgs["pub_id"], eventArgs["stream_id"]) )
+				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
+				// pub_id := eventArgs["pub_id"].(common.Address)
+				// stream_id := eventArgs["stream_id"].(*big.Int)
 				// fmt.Printf("Publisher Added : %s \n", pub_id.Hex())
 
 			case hash_pub_removed:
-				event := make(map[string]interface{})
-				err := pubAbi.UnpackIntoMap(event, "publisher_removed", vLog.Data)
-				if err != nil {
-					fmt.Printf("Error In Unpacking \n")
-				}
-				// pub_id := event["pub_id"].(common.Address)
-				// stream_id := event["stream_id"].(*big.Int)
+				val := make_dynamic_api_call("POST", "http://localhost:8080/remove-user-access", fmt.Sprintf("{\"userWalletAddress\": \"%s\",\"eventQueueId\": \"%s\",\"action\": \"publish\"}", eventArgs["pub_id"], eventArgs["stream_id"]) )
+				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
+
+				// pub_id := eventArgs["pub_id"].(common.Address)
+				// stream_id := eventArgs["stream_id"].(*big.Int)
 				// fmt.Printf("Publisher Removed : %s \n", pub_id.Hex())
 				
 			
 			case hash_pub_deleted:
-				event := make(map[string]interface{})
-				err := pubAbi.UnpackIntoMap(event, "publisher_deleted", vLog.Data)
-				if err != nil {
-					fmt.Printf("Error In Unpacking \n")
-				}
-				// pub_id := event["pub_id"].(common.Address)
+				val := make_dynamic_api_call("POST", "http://localhost:8080/remove-subscriber-access", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["pub_id"]) )
+				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
+				// pub_id := eventArgs["pub_id"].(common.Address)
 				// fmt.Printf("Publisher Deleted : %s \n", pub_id.Hex())
 			
 			case hash_pub_data:
-				fmt.Print("Publisher Data \n")
-				event := make(map[string]interface{})
-				err := pubAbi.UnpackIntoMap(event, "published_data", vLog.Data)
-				if err != nil {
-					fmt.Printf("Error In Unpacking \n")
-				}
-				// pub_id := event["pub_id"].(common.Address)
-				// stream_id := event["stream_id"].(*big.Int)
-				// data := event["data"].(string)
+				val := make_dynamic_api_call("POST", "http://localhost:8080/publish-event", fmt.Sprintf("{\"userWalletAddress\": \"%s\",\"eventQueueId\": \"%s\",\"message\": \"%s\"}", eventArgs["pub_id"], eventArgs["stream_id"], eventArgs["data"]) )
+				fmt.Printf("%s: %s\n", time.Now().Format("2006-01-02 15:04:05"), val)
+				// pub_id := eventArgs["pub_id"].(common.Address)
+				// stream_id := eventArgs["stream_id"].(*big.Int)
+				// data := eventArgs["data"].(string)
 				// fmt.Printf("Publisher Data : %s \n", pub_id.Hex())
 			default:
 		}
