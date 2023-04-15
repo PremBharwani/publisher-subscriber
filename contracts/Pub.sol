@@ -4,7 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 // import {EventQueu} from "./events.sol";
 
 
-contract pub{
+contract Pub{
 
     // this contract is stores information about all the publishers
     // it can create a publisher.
@@ -21,7 +21,6 @@ contract pub{
         _;
     }
     struct publisher{
-        address address_publisher;
         bool exist;
         uint[] access;
     }
@@ -36,15 +35,15 @@ contract pub{
 
     //create publisher allows users to create a publisher and it emits a publisher 
     function create_publisher(address _address_publisher) public{
-        require(msg.sender == _address_publisher, "you are not allowed to create publisher with this address");
+        // require(msg.sender == _address_publisher, "you are not allowed to create publisher with this address");
         require(publisher_list[_address_publisher].exist == false, "publisher already exist");
-        publisher_list[_address_publisher] = publisher(_address_publisher, true, new uint[](0));
+        publisher_list[_address_publisher] = publisher(true, new uint[](0));
         emit publisher_created(_address_publisher);
     }
 
     function publish_to_eventstream(string memory data, uint stream_id, address pub_id) public{
         require(publisher_list[pub_id].exist == true, "publisher does not exist");
-        require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to publish to this event");
+        // require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to publish to this event");
         bool check= false;
         for(uint i = 0; i < publisher_list[pub_id].access.length; i++){
             if(publisher_list[pub_id].access[i] == stream_id){
@@ -60,7 +59,7 @@ contract pub{
 
     function add_publisher(uint stream_id, address pub_id) public{
         require(publisher_list[pub_id].exist == true, "publisher does not exist");
-        require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to add this publisher");
+        // require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to add this publisher");
         bool check= false;
         for(uint i = 0; i < publisher_list[pub_id].access.length; i++){
             if(publisher_list[pub_id].access[i] == stream_id){
@@ -74,7 +73,7 @@ contract pub{
 
     function remove_publisher(uint stream_id,address pub_id) public {
         require(publisher_list[pub_id].exist == true, "publisher does not exist");
-        require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to remove this publisher");
+        // require(publisher_list[pub_id].address_publisher == msg.sender, "you are not allowed to remove this publisher");
         bool check= false;
         for(uint i = 0; i < publisher_list[pub_id].access.length; i++){
             if(publisher_list[pub_id].access[i] == stream_id){
@@ -90,18 +89,17 @@ contract pub{
         emit publisher_removed(pub_id, stream_id);
     }
 
-    function delete_publisher(address _id) public onlyOwner {
+    function delete_publisher(address _id) public  {
         require(publisher_list[_id].exist == true, "publisher does not exist");
-        require(publisher_list[_id].address_publisher == msg.sender, "you are not allowed to delete this publisher");
+        // require(publisher_list[_id].address_publisher == msg.sender, "you are not allowed to delete this publisher");
         publisher_list[_id].exist = false;
-        publisher_list[_id].address_publisher = address(0);
         publisher_list[_id].access = new uint[](0);
         emit publisher_deleted(_id);
     }
 
-    function get_publisher(address pub_id) public view returns(address, uint[] memory){
+    function get_publisher(address pub_id) public view returns( uint[] memory){
         require(publisher_list[pub_id].exist == true, "publisher does not exist");
-        return (publisher_list[pub_id].address_publisher, publisher_list[pub_id].access);
+        return (publisher_list[pub_id].access);
     }
 
 }
