@@ -4,7 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 // import {EventQueu} from "./events.sol";
 
 
-contract pub{
+contract Pub{
 
     // this contract is stores information about all the publishers
     // it can create a publisher.
@@ -73,7 +73,7 @@ contract pub{
             }
         }
         require(check == false, "publisher already has access to this event");
-        require(publisher_list[pub_id].access.length<event_publish_limit,"Subscription limit reached");
+        require(publisher_list[pub_id].access.length<event_publish_limit,"Publishing limit reached");
 
         publisher_list[pub_id].access.push(stream_id);
         emit publisher_added(pub_id, stream_id);
