@@ -12,6 +12,9 @@ contract Sub {
     
     constructor() {
         owner = msg.sender;
+
+        // uncomment these lines to test 'Oracle' thingy
+
         // address test_addr = 0xc0ffee254729296a45a3885639AC7E10F9d54979;
         // relay_eventsCalled[test_addr]=false;
         // filled_till[test_addr]=0;
@@ -24,74 +27,81 @@ contract Sub {
         require(msg.sender == owner, "Only Owner Can Call This Function.");
         _;
     }
-    uint public event_subscribe_limit = 0 ;
-   
+
+    struct subscriber{
+        bool exist;
+        uint[] access;
+    }
+
+    mapping (address => subscriber) public subscriber_list;
+
+
+    uint public event_subscribe_limit = 50 ; // default 50
+
     event subscriber_created(address subscriber_id) ;
     event subscriber_removed(address subscriber_id) ;
-    event subscribed_to_event(address subscriber_id , address event_stream_id) ;
-    event unsubscribed_to_event(address subscriber_id , address event_stream_id) ;
-    event requested_for_events(address subscriber_id, address event_stream_id);
-
+    event subscribed_to_event(address subscriber_id , uint event_stream_id) ;
+    event unsubscribed_to_event(address subscriber_id , uint event_stream_id) ;
+    event requested_for_events(address subscriber_id, uint event_stream_id);
 
     function set_limit(uint256 limit) public OwnerOnly {
-        require(limit<=100, "Limit must be less than or equal to 100");
         event_subscribe_limit = limit ; 
         // emit subscriber_limit_set(limit) ;
     }
-
-    struct Subscriber {
-        address subscriber_id ;
-        address[] event_streams_subscribed ; // stores address of events streams subscribed
-    }
-
-    struct Event_Stream_Iterator{
-        uint position;
-        bool event_exists;
-    }
     
-    mapping(address => mapping(address => Event_Stream_Iterator)) event_stream_iterator_map ; // maps subscriber IDs to map of IDs of events 
-    // subscribed to the iterator of last seen message
-    mapping(address => Subscriber) addr_to_sub;
+    function create_subscriber(address _address_subscriber) public {
+        
+        require(subscriber_list[_address_subscriber].exist == false, "subscriber already exist");
+        subscriber_list[_address_subscriber] = subscriber(true, new uint[](0));
 
-    function create_subscriber(address subscriber_id) public OwnerOnly returns(Subscriber memory) {
-    	Subscriber memory s = Subscriber(subscriber_id, new address[](0));
-        addr_to_sub[subscriber_id]=s;
-        relay_eventsCalled[subscriber_id]=false;
-        filled_till[subscriber_id]=0;
+        relay_eventsCalled[msg.sender]=false;
+        filled_till[msg.sender]=0;
         string[50] memory m; 
-        ret_events[subscriber_id]=m;
-        emit subscriber_created(s.subscriber_id) ;
-	    return s;
+        ret_events[msg.sender]=m;
+
+        emit subscriber_created(_address_subscriber) ;
+
     }
 
-    function delete_subscriber(address add) public OwnerOnly {
-        uint len = addr_to_sub[add].event_streams_subscribed.length;
-        for (uint i = 0; i < len; i++) {
-            delete event_stream_iterator_map[addr_to_sub[add].subscriber_id][addr_to_sub[add].event_streams_subscribed[i]]; // clearing associated mappings first
+    function delete_subscriber(address _id) public {
+        require(subscriber_list[_id].exist == true, "subscriber does not exist");
+        // require(subscriber[_id].address_publisher == msg.sender, "you are not allowed to delete this publisher");
+        subscriber_list[_id].exist = false;
+        subscriber_list[_id].access = new uint[](0);
+        emit subscriber_removed(_id) ;
+    }
+
+
+    function subscribe_to_event(uint stream_id, address sub_id) public {
+        require(subscriber_list[sub_id].exist == true, "subscriber does not exist");
+        // require(subscriber_list[sub_id].address_publisher == msg.sender, "you are not allowed to add this publisher");
+        bool check= false;
+        for(uint i = 0; i < subscriber_list[sub_id].access.length; i++){
+            if(subscriber_list[sub_id].access[i] == stream_id){
+                check = true;
+            }
         }
-        delete addr_to_sub[add].event_streams_subscribed; // clearing information of events_streams_subscribed
-        addr_to_sub[add].subscriber_id = address(0); // removing the address of subscriber
-        emit subscriber_removed(addr_to_sub[add].subscriber_id) ;
+        require(check == false, "subscriber already has access to this event");
+        require(subscriber_list[sub_id].access.length<event_subscribe_limit,"Subscription limit reached");
+        subscriber_list[sub_id].access.push(stream_id);
+        emit subscribed_to_event(sub_id, stream_id);
     }
 
-
-    function subscribe_to_event(address event_stream_id, address add) public OwnerOnly{
-        require( event_stream_iterator_map[addr_to_sub[add].subscriber_id][event_stream_id].event_exists==false , "Subscriber Has already Subscribed To This Event"); // chec
-        require(addr_to_sub[add].event_streams_subscribed.length<event_subscribe_limit,"Subscription limit reached");
-        event_stream_iterator_map[addr_to_sub[add].subscriber_id][event_stream_id] = Event_Stream_Iterator(0, true);
-        addr_to_sub[add].event_streams_subscribed.push(event_stream_id);
-        emit subscribed_to_event(addr_to_sub[add].subscriber_id, event_stream_id);
-    }
-
-    function unsubscribe_to_event(address event_stream_id, address add) public OwnerOnly {
-        require( event_stream_iterator_map[addr_to_sub[add].subscriber_id][event_stream_id].event_exists , "Subscriber Has Not Subscribed To This Event"); // checking if the event has been subscribed        uint i = 0;
-        uint i =0 ;
-        while(addr_to_sub[add].event_streams_subscribed[i] != event_stream_id){
-            i++;
+    function unsubscribe_to_event(uint stream_id, address sub_id) public OwnerOnly {
+        require(subscriber_list[sub_id].exist == true, "subscriber does not exist");
+        // require(subscriber_list[sub_id].address_publisher == msg.sender, "you are not allowed to remove this publisher");
+        bool check= false;
+        for(uint i = 0; i < subscriber_list[sub_id].access.length; i++){
+            if(subscriber_list[sub_id].access[i] == stream_id){
+                check = true;
+            }
         }
-        delete event_stream_iterator_map[addr_to_sub[add].subscriber_id][event_stream_id] ; // clearing the map associated with the subscriber_id and event_stream_id pair
-        addr_to_sub[add].event_streams_subscribed[i] = address(0); // clearing the associated address
-        emit unsubscribed_to_event(addr_to_sub[add].subscriber_id, event_stream_id) ;
+        require(check == true, "subscriber does not have access to this event");
+        for(uint i = 0; i < subscriber_list[sub_id].access.length; i++){
+            if(subscriber_list[sub_id].access[i] == stream_id){
+                subscriber_list[sub_id].access[i] = 0;
+            }
+        }
     }
 
 
@@ -100,10 +110,10 @@ contract Sub {
         uint8 last_index;
     }
 
-    // bool public relay_events_called = false ;
-    // string public checkEvent;
+    bool public relay_events_called = false ;
+    string public checkEvent;
 
-    function get_events(address stream_id, address sub_id) public returns (events_data memory){
+    function get_events(uint stream_id, address sub_id) public returns (events_data memory){
         
         // emit saying the sub needs the events in the particular stream
         emit requested_for_events(sub_id, stream_id);

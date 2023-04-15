@@ -26,12 +26,18 @@ contract Pub{
     }
     mapping (address => publisher) public publisher_list;
 
+    uint public event_publish_limit = 50 ; // default 50
+
     event publisher_created(address pub_id);
     event published_data(address pub_id, uint256 stream_id, string data);
     event publisher_added(address pub_id, uint256 stream_id);
     event publisher_removed(address pub_id, uint256 stream_id);
     event publisher_deleted(address pub_id);
     
+    function set_limit(uint256 limit) public onlyOwner {
+        event_publish_limit = limit ; 
+        // emit subscriber_limit_set(limit) ;
+    }
 
     //create publisher allows users to create a publisher and it emits a publisher 
     function create_publisher(address _address_publisher) public{
@@ -67,6 +73,8 @@ contract Pub{
             }
         }
         require(check == false, "publisher already has access to this event");
+        require(publisher_list[pub_id].access.length<event_publish_limit,"Subscription limit reached");
+
         publisher_list[pub_id].access.push(stream_id);
         emit publisher_added(pub_id, stream_id);
     }
