@@ -11,7 +11,6 @@ contract Pub{
     // it also has the function to publish to an event stream
     // it also has the function to add or remove a publisher from an event stream
 
-
     address owner;
     constructor() {
         owner = msg.sender;

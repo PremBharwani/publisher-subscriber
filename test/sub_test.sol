@@ -1,32 +1,77 @@
+
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../contracts/scripts/sub.sol";
+import "../contracts/Sub.sol";
 
 contract TestSubCurrency {
 
-    sub public SUB;
+    Sub public SUB;
 
     // Run before every test function
     function beforeEach() public {
-        SUB = new sub();
+        SUB = new Sub();
     }
 
-
-    function testcreate_subscriber() public {
-        address subs_id = SUB.create_subscriber(this, new address[](0));
-        Assert.equal(sub_id, address(this), "It should store the correct value");
-
-        string name;
-        address subscriber_id ;
-        int[] event_streams_subscribed ;
-        (naeme, subscriber_id, event_streams_subscribed) = SUB.get_subscriber(address(this));
-        Assert.equal(subscriber_id, address(this) ,"It should store the correct value");
-
+    //function to test create subscriber
+    function test_create_subscriber() public {
+        SUB.create_subscriber(address(this));
+        uint[] memory access;
+        access = SUB.get_subscriber(address(this));
     }
 
-  
+    //function to add a subscriber to an event stream
+    function test_subscribe_to_event() public {
+        uint stream_id = 7;
+        SUB.create_subscriber(address(this));
+        SUB.subscribe_to_event(stream_id, address(this));
+        uint[] memory access = SUB.get_subscriber(address(this));
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding subscriber to stream_id successful");
+    }
+
+    //function to remove a subscriber from an event stream
+    function test_unsubscribe_to_event() public {
+        uint stream_id = 2;
+        SUB.create_subscriber(address(this));
+        SUB.subscribe_to_event(stream_id, address(this));
+        uint[] memory access;
+        access = SUB.get_subscriber(address(this));
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding subscriber to stream_id successful");
+        SUB.unsubscribe_to_event(stream_id, address(this));
+        Assert.equal(access[stream_id], 0, "Removing subscriber unsuccesful");
+    }
+
+    //function to test delete subscriber
+    function test_delete_subscriber() public {
+        uint stream_id = 6;
+        SUB.create_subscriber(address(this));
+        SUB.subscribe_to_event(stream_id, address(this));
+        uint[] memory access = SUB.get_subscriber(address(this));
+        bool check= false;
+        for(uint i = 0; i < access.length; i++){
+            if(access[i] == stream_id){
+                check = true;
+            }
+        }
+        Assert.equal(check, true, "Adding subscriber to stream_id successful");
+        SUB.delete_subscriber(address(this));
+        access = SUB.get_subscriber(address(this));
+        Assert.equal(access.length, 0, "Subscriber Deletion unsuccessful");
+    }
+
 }

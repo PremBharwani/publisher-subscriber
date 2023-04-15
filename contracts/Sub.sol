@@ -27,19 +27,19 @@ contract Sub {
 
     struct subscriber{
         bool exist;
-        uint[] access;
+        uint256[] access;
     }
 
     mapping (address => subscriber) public subscriber_list;
 
 
-    uint public event_subscribe_limit = 50 ; // default 50
+    uint256 public event_subscribe_limit = 50 ; // default 50
 
     event subscriber_created(address subscriber_id) ;
     event subscriber_removed(address subscriber_id) ;
-    event subscribed_to_event(address subscriber_id , uint event_stream_id) ;
-    event unsubscribed_to_event(address subscriber_id , uint event_stream_id) ;
-    event requested_for_events(address subscriber_id, uint event_stream_id);
+    event subscribed_to_event(address subscriber_id , uint256 event_stream_id) ;
+    event unsubscribed_to_event(address subscriber_id , uint256 event_stream_id) ;
+    event requested_for_events(address subscriber_id, uint256 event_stream_id);
 
     function set_limit(uint256 limit) public OwnerOnly {
         event_subscribe_limit = limit ; 
@@ -49,7 +49,7 @@ contract Sub {
     function create_subscriber(address _address_subscriber) public {
         
         require(subscriber_list[_address_subscriber].exist == false, "subscriber already exist");
-        subscriber_list[_address_subscriber] = subscriber(true, new uint[](0));
+        subscriber_list[_address_subscriber] = subscriber(true, new uint256[](0));
 
         emit subscriber_created(_address_subscriber) ;
 
@@ -59,16 +59,16 @@ contract Sub {
         require(subscriber_list[_id].exist == true, "subscriber does not exist");
         // require(subscriber[_id].address_publisher == msg.sender, "you are not allowed to delete this publisher");
         subscriber_list[_id].exist = false;
-        subscriber_list[_id].access = new uint[](0);
+        subscriber_list[_id].access = new uint256[](0);
         emit subscriber_removed(_id) ;
     }
 
 
-    function subscribe_to_event(uint stream_id, address sub_id) public {
+    function subscribe_to_event(uint256 stream_id, address sub_id) public {
         require(subscriber_list[sub_id].exist == true, "subscriber does not exist");
         // require(subscriber_list[sub_id].address_publisher == msg.sender, "you are not allowed to add this publisher");
         bool check= false;
-        for(uint i = 0; i < subscriber_list[sub_id].access.length; i++){
+        for(uint256 i = 0; i < subscriber_list[sub_id].access.length; i++){
             if(subscriber_list[sub_id].access[i] == stream_id){
                 check = true;
             }
@@ -79,21 +79,26 @@ contract Sub {
         emit subscribed_to_event(sub_id, stream_id);
     }
 
-    function unsubscribe_to_event(uint stream_id, address sub_id) public OwnerOnly {
+    function unsubscribe_to_event(uint256 stream_id, address sub_id) public OwnerOnly {
         require(subscriber_list[sub_id].exist == true, "subscriber does not exist");
         // require(subscriber_list[sub_id].address_publisher == msg.sender, "you are not allowed to remove this publisher");
         bool check= false;
-        for(uint i = 0; i < subscriber_list[sub_id].access.length; i++){
+        for(uint256 i = 0; i < subscriber_list[sub_id].access.length; i++){
             if(subscriber_list[sub_id].access[i] == stream_id){
                 check = true;
             }
         }
         require(check == true, "subscriber does not have access to this event");
-        for(uint i = 0; i < subscriber_list[sub_id].access.length; i++){
+        for(uint256 i = 0; i < subscriber_list[sub_id].access.length; i++){
             if(subscriber_list[sub_id].access[i] == stream_id){
                 subscriber_list[sub_id].access[i] = 0;
             }
         }
+    }
+
+    function get_subscriber(address sub_id) public view returns( uint[] memory){
+        require(subscriber_list[sub_id].exist == true, "subscriber does not exist" );
+        return (subscriber_list[sub_id].access);
     }
 
 

@@ -19,11 +19,15 @@ app.post('/send-events', (req, res) => {
 
   // get data from req
   // console.log(typeof req.body)
-  // console.log(req.body.type)
+  console.log("FUCKKKK : ", req.body)
+  
+  // const ret = "OK"
+  // res.json({ret})
 
   let cmd_args = ""
   cmd_args+=req.body.sub_id
   cmd_args+=" "
+
   for (let i=0;i<req.body.data.length;i++){
     cmd_args+=req.body.data[i];
     cmd_args+=" "

@@ -1,10 +1,43 @@
-package scripts
+package main
+/*
+var accounts;
+web3.eth.getAccounts(function(err,res){accounts=res;});
 
+Events.deployed().then(function (i){eve=i})
+Pub.deployed().then(function (i){pub=i})
+Sub.deployed().then(function (i){sub=i})
+
+eve.add_topic()
+
+pub.create_publisher('0xac8084232d2f5f459F480d903ac9315B011371a8')
+pub.add_publisher(1, '0xac8084232d2f5f459F480d903ac9315B011371a8')
+pub.publish_to_eventstream("nikhil", 1, '0xac8084232d2f5f459F480d903ac9315B011371a8')
+
+sub.create_subscriber('0x77Aca80c0510685F6C9d6De87aF315c1817e8bC3')
+sub.subscribe_to_event(1, '0x77Aca80c0510685F6C9d6De87aF315c1817e8bC3')
+sub.call_for_events(1, '0x77Aca80c0510685F6C9d6De87aF315c1817e8bC3')
+
+truffle(ganache)> [
+  '0xac8084232d2f5f459F480d903ac9315B011371a8',
+  '0x77Aca80c0510685F6C9d6De87aF315c1817e8bC3',
+  '0x19FF33D1Bb54C868c4efCC555d69Da07218fB9Dd',
+  '0xFcadf6Ce8a3e5461d3D9702574B68273c299251E',
+  '0xB6b0Db2ff1e44936EeBB9F33369F8678fF80DD46',
+  '0xD81BA89f99Bb36FbeaC0Db40453b53013f93D06A',
+  '0xc8dD61E2796A11319C1cC9DDC245004906f8c690',
+  '0x550E6aC95B95F57E8c9678E7e3e57C051201243b',
+  '0x2F2c1C9DeC3547941c845c75dCF7139C6c74542A',
+  '0x19633C11AE598c9EA10024f45321Aa06c7a31517'
+]
+
+
+*/
 import (
 	"context"
 	"log"
-	"math/big"
 	"fmt"
+
+	// "math/big"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -14,12 +47,22 @@ import (
 
 func main() {
 	
-	pubAddress := "0x123456789123456789123456789"
-	subAddress := "0x123456789123456789123456789"
-	eventAddress := "0x123456789123456789123456789"
+	pubAddress := "0x4Cf87ab6E7e421bC9749a9a086c5BcBf6b0c2aDD"
+	subAddress := "0x6ae1f3208e7367DEC1Cf15D09bfA0300945ba035"
+	eventAddress := "0x995aA13F62ceAB6c4EafeD37D7a7Ba77Db9E7413"
 	
-	LastBlockId := big.NewInt(0)
+	// LastBlockId := big.NewInt(0)
 
+	// Set the LastBlockId to the latest block
+	client, err := ethclient.Dial("HTTP://127.0.0.1:7545")
+	if err != nil {
+		log.Fatal(err)
+	}
+	latestBlock, err := client.BlockByNumber(context.Background(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	LastBlockId := latestBlock.Number()
 
 	for {
 
@@ -39,6 +82,7 @@ func main() {
 		if err != nil {
 			fmt.Printf("Error In Filtering Logs \n")
 		}
+		
 
 
 		LastBlockId = listen_pub_logs(logs, LastBlockId) 
