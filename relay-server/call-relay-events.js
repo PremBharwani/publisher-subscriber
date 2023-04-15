@@ -5,7 +5,7 @@ const fs = require('fs');
 // const args = ["event1", "event2"]
 
 const all_args = process.argv 
-console.log(all_args)
+// console.log(all_args)
 var args = []
 
 // fill events from the passed args

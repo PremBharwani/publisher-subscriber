@@ -18,8 +18,8 @@ app.post('/send-events', (req, res) => {
     // }
 
   // get data from req
-  console.log(typeof req.body)
-  console.log(req.body.type)
+  // console.log(typeof req.body)
+  // console.log(req.body.type)
 
   let cmd_args = ""
   cmd_args+=req.body.sub_id
@@ -30,7 +30,7 @@ app.post('/send-events', (req, res) => {
   }
 
   // call the js file
-  console.log("before calling relay-events")
+  // console.log("before calling relay-events")
 
   var cmd ="truffle exec call-relay-events.js "+cmd_args 
 
