@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
-// import {EventQueu} from "./events.sol";
+// import {EventQueue} from "./events.sol";
 
 
 contract pub{
@@ -10,7 +10,9 @@ contract pub{
     // it can create a publisher.
     // it also has the function to publish to an event stream
     // it also has the function to add or remove a publisher from an event stream
-
+//    EventQueue my_queue = EventQueue(0x2A7cA5625D29537671F089E1f99DF856B17d725D);
+    
+    
 
     address owner;
     constructor() {
@@ -28,21 +30,21 @@ contract pub{
     }
     mapping (address => publisher1) public publisher;
 
-    event published(uint indexed stream_id, address indexed pub_id);
-    event publisher_added(uint indexed stream_id, address indexed pub_id);
-    event publisher_created(string indexed name, address indexed address_publisher);
-    event publisher_removed(uint indexed stream_id, address indexed pub_id);
-
+    event publisher_created(address pub_id);
+    event published_data(address pub_id, uint256 stream_id, string data);
+    event publisher_added(address pub_id, uint256 stream_id);
+    event publisher_removed(address pub_id, uint256 stream_id);
+    event publisher_deleted(address pub_id);
+    
     //create publisher allows users to create a publisher and it emits a publisher 
-    function create_publisher(string memory _name, address _address_publisher,uint stream_id) public returns(uint){
+    function create_publisher(string memory _name, address _address_publisher) public{
         require(msg.sender == _address_publisher, "you are not allowed to create publisher with this address");
+        require(publisher[_address_publisher].exist == false, "publisher already exist");
         publisher[_address_publisher] = publisher1(_name, _address_publisher, true, new uint[](0));
-        emit publisher_created(_name, _address_publisher);
-        publisher[_address_publisher].access.push(stream_id);
-        return publisher[_address_publisher].access.length;
+        emit publisher_created(_address_publisher);
     }
 
-    function pub_to_event(bytes32 data, uint stream_id, address pub_id) public{
+    function pub_to_event(string memory data, uint stream_id, address pub_id) public{
         require(publisher[pub_id].exist == true, "publisher does not exist");
         require(publisher[pub_id].address_publisher == msg.sender, "you are not allowed to publish to this event");
         bool check= false;
@@ -52,8 +54,8 @@ contract pub{
             }
         }
         require(check == true, "publisher does not have access to this event");
-        // publish_to_event_stream(stream_id, data);
-        emit published(stream_id,pub_id);
+        // my_queue.publish_to_event_stream(stream_id, data);
+        emit published_data( pub_id, stream_id, data);
         
     }
 
@@ -68,7 +70,7 @@ contract pub{
         }
         require(check == false, "publisher already has access to this event");
         publisher[pub_id].access.push(stream_id);
-        emit publisher_added(stream_id,pub_id);
+        emit publisher_added( pub_id,stream_id);
     }
 
     function remove_publisher(uint stream_id,address pub_id) public {
@@ -86,7 +88,7 @@ contract pub{
                 publisher[pub_id].access[i] = 0;
             }
         }
-        emit publisher_removed(stream_id,pub_id);
+        emit publisher_removed(pub_id, stream_id);
     
     }
     function delete_publisher(address _id) public onlyOwner {
@@ -96,6 +98,7 @@ contract pub{
         publisher[_id].address_publisher = address(0);
         publisher[_id].name = "";
         publisher[_id].access = new uint[](0);
+        emit publisher_deleted(_id);
     }
 
     function get_publisher(address _id) public view returns(string memory, address, uint[] memory){
