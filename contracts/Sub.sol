@@ -54,11 +54,6 @@ contract Sub {
         require(subscriber_list[_address_subscriber].exist == false, "subscriber already exist");
         subscriber_list[_address_subscriber] = subscriber(true, new uint[](0));
 
-        relay_eventsCalled[msg.sender]=false;
-        filled_till[msg.sender]=0;
-        string[50] memory m; 
-        ret_events[msg.sender]=m;
-
         emit subscriber_created(_address_subscriber) ;
 
     }
@@ -113,26 +108,56 @@ contract Sub {
     bool public relay_events_called = false ;
     string public checkEvent;
 
-    function get_events(uint stream_id, address sub_id) public returns (events_data memory){
+    function call_for_events(uint stream_id, address sub_id) public {
         
+        relay_eventsCalled[sub_id]=false;
+        filled_till[sub_id]=0;
+        string[50] memory m; 
+        ret_events[sub_id]=m;
+
         // emit saying the sub needs the events in the particular stream
         emit requested_for_events(sub_id, stream_id);
 
         // wait until relay_events() is called
 
-        while(!relay_eventsCalled[sub_id]){
+        // while(!relay_eventsCalled[sub_id]){
+        //     //wait
+        // }
+
+        // // relay_eventsCalled[sub_id]=false;
+        // events_data memory ev;
+        // ev.events=ret_events[sub_id];
+        // ev.last_index=filled_till[sub_id];
+
+        // //delete the flag
+
+        // delete relay_eventsCalled[sub_id];
+        // delete filled_till[sub_id];
+        // delete ret_events[sub_id];
+
+        // return ev;
+
+    }
+
+    function get_back_events(address sub_id) public returns (events_data memory){
+
+         while(!relay_eventsCalled[sub_id]){
             //wait
         }
 
-        relay_eventsCalled[sub_id]=false;
+        // relay_eventsCalled[sub_id]=false;
         events_data memory ev;
         ev.events=ret_events[sub_id];
         ev.last_index=filled_till[sub_id];
 
+        //delete the flag
+
+        delete relay_eventsCalled[sub_id];
+        delete filled_till[sub_id];
+        delete ret_events[sub_id];
+
         return ev;
-
     }
-
 
 
     function relay_events(string[] memory events, address sub_id) public {
@@ -146,8 +171,8 @@ contract Sub {
         }
 
         filled_till[sub_id]=i-1;
-        // relay_events_called=true ;
-        // checkEvent = events[0];
+        relay_events_called=true ;
+        checkEvent = events[0];
         relay_eventsCalled[sub_id]=true;
         return;
 
