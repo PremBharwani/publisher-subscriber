@@ -5,40 +5,36 @@ const { exec } = require('child_process');
 
 const app = express();
 app.use(express.json());
-const web3 = new Web3('http://localhost:7545');
+// const web3 = new Web3('http://localhost:7545');
 
 // the API endpoint
 app.post('/send-events', (req, res) => {
   
-    //   Request body:
-    // {  
-    //   "type": relay_events
+    //   Request body format:
+    // {
+    //   "type": "relay_events",
+    //   "sub_id": "0xc0ffee254729296a45a3885639AC7E10F9d54979",
     //   "data": ["event1", "event2"]
-    // 
     // }
 
   // get data from req
   console.log(typeof req.body)
   console.log(req.body.type)
-  const jsonString = JSON.stringify(req.body);
-  
-  // write data to json for the truffle js file to take as input
-  console.log("before writing json")
-  console.log(jsonString)
-  
-  fs.writeFile('relay_events.json', jsonString, (err) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log('JSON made');
-    }
-  });
+
+  let cmd_args = ""
+  cmd_args+=req.body.sub_id
+  cmd_args+=" "
+  for (let i=0;i<req.body.data.length;i++){
+    cmd_args+=req.body.data[i];
+    cmd_args+=" "
+  }
 
   // call the js file
   console.log("before calling relay-events")
 
+  var cmd ="truffle exec call-relay-events.js "+cmd_args 
 
-  exec('truffle exec call-relay-events.js', (error, stdout, stderr) => {
+  exec(cmd, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return;

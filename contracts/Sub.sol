@@ -6,9 +6,18 @@ pragma solidity >= 0.8.2 <0.9.0;
 contract Sub {
     
     address owner;
+    mapping(address => bool) relay_eventsCalled;
+    mapping(address => string[50]) private ret_events;
+    mapping(address => uint8) private filled_till; 
     
     constructor() {
         owner = msg.sender;
+        // address test_addr = 0xc0ffee254729296a45a3885639AC7E10F9d54979;
+        // relay_eventsCalled[test_addr]=false;
+        // filled_till[test_addr]=0;
+        // string[50] memory m; 
+        // ret_events[test_addr]=m;
+
     }
     
     modifier OwnerOnly() {
@@ -47,10 +56,13 @@ contract Sub {
     function create_subscriber(address subscriber_id) public OwnerOnly returns(Subscriber memory) {
     	Subscriber memory s = Subscriber(subscriber_id, new address[](0));
         addr_to_sub[subscriber_id]=s;
+        relay_eventsCalled[subscriber_id]=false;
+        filled_till[subscriber_id]=0;
+        string[50] memory m; 
+        ret_events[subscriber_id]=m;
         emit subscriber_created(s.subscriber_id) ;
 	    return s;
     }
-
 
     function delete_subscriber(address add) public OwnerOnly {
         uint len = addr_to_sub[add].event_streams_subscribed.length;
@@ -81,18 +93,15 @@ contract Sub {
         addr_to_sub[add].event_streams_subscribed[i] = address(0); // clearing the associated address
         emit unsubscribed_to_event(addr_to_sub[add].subscriber_id, event_stream_id) ;
     }
-    
-    
-    
-    bool private relay_eventsCalled = false;
-    // uint private max_events_at_a_time=100;
-    string[100] private ret_events ; // keeping a dynamic array will increase gas usage (clearing the array). Just overwrite
-    uint private filled_till;
+
 
     struct events_data {
-        string[100] events;
-        uint last_index;
+        string[50] events;
+        uint8 last_index;
     }
+
+    // bool public relay_events_called = false ;
+    // string public checkEvent;
 
     function get_events(address stream_id, address sub_id) public returns (events_data memory){
         
@@ -101,31 +110,35 @@ contract Sub {
 
         // wait until relay_events() is called
 
-        while(!relay_eventsCalled){
+        while(!relay_eventsCalled[sub_id]){
             //wait
         }
 
-        relay_eventsCalled=false;
+        relay_eventsCalled[sub_id]=false;
         events_data memory ev;
-        ev.events=ret_events;
-        ev.last_index=filled_till;
+        ev.events=ret_events[sub_id];
+        ev.last_index=filled_till[sub_id];
 
         return ev;
 
     }
 
-    function relay_events(string[] memory events) public {
+
+
+    function relay_events(string[] memory events, address sub_id) public {
         // this function will be called from the js script (which gets the  data from the go script)
 
         // need to return this data to the call that called get_events()
 
-        uint i=0;
+        uint8 i=0;
         for(; i<events.length; i++){
-            ret_events[i]=events[i];
+            ret_events[sub_id][i]=events[i];
         }
 
-        filled_till=i-1;
-        relay_eventsCalled=true;
+        filled_till[sub_id]=i-1;
+        // relay_events_called=true ;
+        // checkEvent = events[0];
+        relay_eventsCalled[sub_id]=true;
         return;
 
     }
