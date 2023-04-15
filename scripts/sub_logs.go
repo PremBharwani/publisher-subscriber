@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"encoding/json"
 	// "net/http"
 	// "io/ioutil"
 	// "bytes"
@@ -14,6 +15,11 @@ import (
 
 
 )
+
+type apiRespStruct struct {
+	Message []string `json:"message"`
+}
+
 
 var greetM bool = false
 func listen_sub_logs(logs []types.Log, LastBlockId *big.Int) *big.Int {
@@ -89,10 +95,39 @@ func listen_sub_logs(logs []types.Log, LastBlockId *big.Int) *big.Int {
 				} 
 				eventMessages := make_dynamic_api_call("GET", "http://localhost:8080/consume-event", 
 					fmt.Sprintf("{\"userWalletAddress\":\"%s\",\"eventQueueId\": \"%s\"}", eventArgs["subscriber_id"], eventArgs["event_stream_id"]) )
-				fmt.Printf("Messages recieved on the listener server : %s\n", eventMessages)
+				// fmt.Printf("Messages recieved on the listener server : %s\n", eventMessages)
 				// var1 : = make_api_call("http://localhost:8080/create-user", fmt.Sprintf("{\"userWalletAddress\": \"%s\"}", eventArgs["subscriber_id"]) )
 				// subscriber_id
 				// event_stream_id
+
+				var jsonMessage apiRespStruct
+				json.Unmarshal([]byte(eventMessages), &jsonMessage)
+				messageEventsArr := jsonMessage.Message
+				fmt.Printf("over hrere %s\n", messageEventsArr[0])
+				
+				//Iterate over messageEventsArr and make a json string
+				var jsonString string
+				jsonString += "["
+				for i := 0; i < len(messageEventsArr); i++ {
+					jsonString += fmt.Sprintf("\"%s\"", messageEventsArr[i])
+					if i!= len(messageEventsArr)-1 {
+						jsonString += ", "
+					}
+				}
+				//Remove last comma from the json string
+
+				jsonString += "]"
+				// fmt.Printf("check this out %s\n", jsonString)
+				// dummyJsonString := fmt.Sprintf("{\"type\":\"relay_events\",\"sub_id\": \"%s\",\"data\": [\"1\", \"2\"]}", eventArgs["subscriber_id"])
+				
+				fmt.Printf("Messages recieved on the listener server : %s\n", messageEventsArr)
+				// fmt.Printf("JSon obj : %s\n", dummyJsonString)//, messageEventsArr))
+				apiResp := make_dynamic_api_call("POST", "http://localhost:3000/send-events", 
+					fmt.Sprintf("{\"type\":\"relay_events\",\"sub_id\": \"%s\",\"data\": %s}", eventArgs["subscriber_id"], jsonString) )
+				if(apiResp!=""){
+					fmt.Printf("API Response to send it to the sol: %s", apiResp)
+				}
+				fmt.Printf("Messages recieved on the listener server : %s\n", eventMessages)
 			default :
 				continue
 		}

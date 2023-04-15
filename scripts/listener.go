@@ -47,9 +47,9 @@ import (
 
 func main() {
 	
-	pubAddress := "0x5751B874ed01344b9b87d03a800298502a41bf35"
-	subAddress := "0x01fDC4F2E5583E700f962FeCf8bdf85973993411"
-	eventAddress := "0x4222843246A77FaBa6a963B524076849BE78BddA"
+	pubAddress := "0x4Cf87ab6E7e421bC9749a9a086c5BcBf6b0c2aDD"
+	subAddress := "0x6ae1f3208e7367DEC1Cf15D09bfA0300945ba035"
+	eventAddress := "0x995aA13F62ceAB6c4EafeD37D7a7Ba77Db9E7413"
 	
 	// LastBlockId := big.NewInt(0)
 
